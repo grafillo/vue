@@ -4,6 +4,7 @@
 
         <div class='bg-warning text-danger'>
             <b>
+                {{article.id}}
                  <router-link :to="{name:'articleAutor',params:{id: article.autor.id}}">
                     {{article.autor.firstname + article.autor.lastname }}
                 </router-link>
@@ -24,24 +25,34 @@
             <template v-if="this.$parent.$parent.$parent.userType === 'admin'  || this.$parent.$parent.$parent.userId === article.autor.id">
             <router-link :to="{name:'articleEdit',params:{id:article.id}}" class='btn btn-warning btn-sm'>Редактировать</router-link>
             &nbsp
-            <a @click.prevent='deleteArticle' href="" class='btn btn-danger btn-sm' >Удалить</a>
+            <a @click.prevent='openPopup' href="" class='btn btn-danger btn-sm' >Удалить</a>
             </template>
 
 
         </div>
     </div>
+
+    <popup-component v-if="popup" @popupSent="popupSent"></popup-component>
 </template>
 
 <script>
+    import PopupComponent from "./PopupComponent.vue";
+
     export default {
+        components: {PopupComponent},
         data(){
             return{
-
+                popup:false
             }
 
         },
         props: ['article','text'],
+        inject:['prov_inj'],
         methods:{
+            openPopup(){
+                this.popup = true
+            },
+
             deleteArticle(){
                // console.log(this.article.id)
 
@@ -62,11 +73,18 @@
                         this.errors = error.response.data.errors
                     })
 
-          }
+          },
+            popupSent(data){
+                this.popup = false
+                if(data==='yes'){
+                    this.deleteArticle()
+                }
+
+            }
 
         },
         mounted() {
-            // console.log('text'+this.text)
+            console.log('inject '+this.prov_inj)
             // console.log('proba1'+ this.proba)
             // console.log('Component mounted article.')
             // console.log(this.$parent.$parent.$parent.title)

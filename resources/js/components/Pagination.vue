@@ -1,14 +1,14 @@
 <template>
     <div class="pagination">
 
-<a v-if="startPage!==1"><h1>1...</h1></a>
+<a v-if="startPage!==1" href="" @click.prevent="handleClick(1)"><h1>1...</h1></a>
 
         <a  v-for="i in showPage"
             href=""
             :class="{ active: i+startPage-1 === currentPage }"
             @click.prevent="handleClick(i+startPage-1)"><h1>{{i+startPage-1}}</h1></a>
 
-        <a v-if="this.startPage !== this.lastPage -  this.showPage +1"><h1>...{{this.lastPage}}</h1></a>
+        <a v-if="this.startPage !== this.lastPage -  this.showPage +1" href="" @click.prevent="handleClick(lastPage)"><h1>...{{this.lastPage}}</h1></a>
 
     </div>
 </template>

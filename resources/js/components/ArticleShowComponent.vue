@@ -24,7 +24,8 @@ import ArticleComponent from "./ArticleComponent.vue";
         data(){
            return{
                articles : null,
-               error : null
+               error : null,
+
            }
 
         },
@@ -46,6 +47,7 @@ import ArticleComponent from "./ArticleComponent.vue";
         },
         mounted(){
             this.getArticles();
-        }
+        },
+
     }
 </script>

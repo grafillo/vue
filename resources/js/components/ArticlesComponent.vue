@@ -2,13 +2,13 @@
 
 <div  >Сортировка
 
-    <select  v-model="type" @change="sorting">
+    <select v-model="type"  @change="sortingType">
         <option value="id">   ID     </option>
         <option value="title">  title      </option>
     </select>
 
-    <select  v-model="sort">
-        <option value="asc" @click="sorting">   Возратсан     </option>
+    <select v-model="sort"   @change="sorting">
+        <option value="asc" >   Возратсан     </option>
         <option value="desc">  Убыван      </option>
     </select>
 </div>
@@ -20,7 +20,7 @@
 
     ></article-component>
 
-    <Pagination @pageSelected="getArticles()"
+    <Pagination @pageSelected="getArticles"
         v-if="pagination.lastPage"
         v-bind:currentPage = pagination.currentPage
         v-bind:lastPage = pagination.lastPage
@@ -48,12 +48,13 @@ import {ref} from "vue";
                sort: 'asc',
                type: 'id',
                page:1,
-               baseUrl: '/api/articles',
+               apiUrl: '/api/articles',
                pagination: {
                    currentPage: 1,
                    totalArticles: 1,
                    lastPage:  0
-               }
+               },
+               provide_text: "injection"
 
            }
 
@@ -62,10 +63,23 @@ import {ref} from "vue";
         methods:{
 
             getArticles(){
-                //console.log(this.$route.query.page+'watch.currentPage')
+                console.log('getArticles'+this.$route.query.type)
 
+                let url = this.apiUrl
+                if (this.$route.query.type){
+                    url+='?&type='+this.$route.query.type
+                }else {url+='?type='+this.type}
 
-                axios.get(this.url+'&page='+this.$route.query.page)
+                if (this.$route.query.sort){
+                    url+='&sort='+this.$route.query.sort
+                }
+
+                if (this.$route.query.page){
+                    url+='&page='+this.$route.query.page
+                }
+                console.log(url)
+
+                axios.get(url)
                     .then(
                         res=>{
                             //console.log(res.data.currentPage+'hh')
@@ -87,7 +101,34 @@ import {ref} from "vue";
 
             sorting(event){
                 const selectedValue = event.target.value
-                console.log('Выбрали:', selectedValue)
+                this.$router.push({
+                    query: {
+                        ...this.$route.query, // сохраняем существующие
+                        sort: selectedValue,
+                    }
+                })
+
+
+            },
+            sortingType(event){
+                const selectedValue = event.target.value
+                this.$router.push({
+                    query: {
+                        ...this.$route.query, // сохраняем существующие
+                        type: selectedValue,
+                    }
+                })
+
+
+            },
+            selectedFromUrl(){
+                if (this.$route.query.type){
+                    this.type=this.$route.query.type
+                }
+
+                if (this.$route.query.sort){
+                    this.sort=this.$route.query.sort
+                }
 
             }
             // changePage(pageNum) {
@@ -99,20 +140,28 @@ import {ref} from "vue";
 
         computed: {
 
-           url() {
-                return `${this.baseUrl}?sort=${this.sort}&type=${this.type}`
-            }
+           // url() {
+           //      return `${this.baseUrl}?sort=${this.sort}&type=${this.type}`
+           //  }
         },
 
         mounted(){
-            if(this.$route.query.page){this.page = this.$route.query.page}
-            if(this.$route.query.type){this.type = this.$route.query.type}
-            if(this.$route.query.sort){this.sort = this.$route.query.sort}
+            // if(this.$route.query.page){this.page = this.$route.query.page}
+            // if(this.$route.query.type){this.type = this.$route.query.type}
+            // if(this.$route.query.sort){this.sort = this.$route.query.sort}
 
-            this.paginationEvent = this.$refs.paginationEvent;
+            //this.paginationEvent = this.$refs.paginationEvent;
+
+            this.selectedFromUrl()
+            console.log( this.$route.query.type+'p')
             this.getArticles();
-            console.log( this.pagination.totalPage+'p')
 
+
+        },
+        provide(){
+            return{
+                prov_inj: this.provide_text
+            }
         },
 
         watch: {
@@ -138,6 +187,11 @@ import {ref} from "vue";
                 this.getArticles()
 
            },
+            '$route'(to, from) {
+                console.log( this.$route.query.type+'p')
+                this.getArticles()
+
+            }
 
 
 },
