@@ -66,6 +66,7 @@ export default {
             // console.log(this.$route.query.page+'route.query.page')
             //this.$parent.getArticles()
             //this.pages()
+            //comeet
 
         }
 
